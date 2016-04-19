@@ -1,0 +1,22 @@
+body {
+    background: #eee;
+    padding: 2em;
+    font-size: 100%;
+    font-family: sans-serif;
+}
+
+div {
+    margin-bottom: 1em;
+}
+
+#passwordField {
+    padding:3px;
+    width:100%;
+}
+
+.figure {
+    display: block;
+    width:50px;
+    //height:20px;
+    padding:4px;
+}
