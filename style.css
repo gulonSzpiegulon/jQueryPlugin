@@ -2,3 +2,16 @@
     padding:3px;
     width:200px;
 }
+
+.invalid {
+    border-color: red;
+}
+
+.valid {
+    border-color: green;
+}
+
+.empty {
+    border-color: black;
+}
+
