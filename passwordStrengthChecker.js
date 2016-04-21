@@ -44,7 +44,7 @@
     }
 
     function passwordContainsCharacters(passwordValue, lowerBound, upperBound) {
-        for (i = 0; i < passwordValue.length; i++) {
+        for (var i = 0; i < passwordValue.length; i++) {
             if (passwordValue.charAt(i) >= lowerBound && passwordValue.charAt(i) <= upperBound) {
                // console.log('password contains character beetween ' + lowerBound + ' and ' + upperBound); //sprawdzacz
                 return true;
@@ -53,7 +53,7 @@
     }
 
     function areSpecialCharactersInPassword(passwordValue) {
-        for (i = 0; i < passwordValue.length; i++) {
+        for (var i = 0; i < passwordValue.length; i++) {
             if ( (passwordValue.charAt(i) >= " " && passwordValue.charAt(i) <= "/") ||
                  (passwordValue.charAt(i) >= ":" && passwordValue.charAt(i) <= "@") ||
                  (passwordValue.charAt(i) >= "[" && passwordValue.charAt(i) <= "`") ||
@@ -66,10 +66,10 @@
 
     function caluculateStrengthOfThePassword(passwordEntropy, entropyOfStrongPassword) {
         var passwordStrength;
-        if (entropyOfStrongPassword != 0) {
+        if (entropyOfStrongPassword !== 0) {
             passwordStrength = passwordEntropy / entropyOfStrongPassword;
         } else {
-            if (passwordEntropy != 0) {
+            if (passwordEntropy !== 0) {
                 passwordStrength = 1;
             } else {
                 passwordStrength = 0;
@@ -99,6 +99,6 @@
                 modifyPasswordStrengthMeter($(this).val(), parameters.entropyValueOfStrongPassword, parameters.passwordStrengthMeterId);
             });
         });
-    }
+    };
 
 })(jQuery);
