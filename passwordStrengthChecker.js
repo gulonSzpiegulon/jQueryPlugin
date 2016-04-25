@@ -29,16 +29,16 @@
         return false;
     }
 
-    function modifyInputOutfit(input, status, invalidCssClassName, emptyCssClassName, validCssClassName) {
+    function modifyInputOutfit(input, status, invalidCssClass, emptyCssClass, validCssClass) {
         switch(status) {
             case 'valid' :
-                input.removeClass(invalidCssClassName).removeClass(emptyCssClassName).addClass(validCssClassName);
+                input.removeClass(invalidCssClass).removeClass(emptyCssClass).addClass(validCssClass);
                 break;
             case 'empty' :
-                input.removeClass(invalidCssClassName).removeClass(validCssClassName).addClass(emptyCssClassName);
+                input.removeClass(invalidCssClass).removeClass(validCssClass).addClass(emptyCssClass);
                 break;
             case 'invalid' :
-                input.removeClass(validCssClassName).removeClass(emptyCssClassName).addClass(invalidCssClassName);
+                input.removeClass(validCssClass).removeClass(emptyCssClass).addClass(invalidCssClass);
                 break;
         }
     }
@@ -46,9 +46,9 @@
     $.fn.addEmailValidator = function(options) {
         var params = $.extend({
             regex : /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
-            invalidCssClassName : 'invalid',
-            emptyCssClassName : 'empty',
-            validCssClassName : 'valid'
+            invalidCssClass : 'invalid',
+            emptyCssClass : 'empty',
+            validCssClass : 'valid'
         }, options);
 
         function checkEmailStatus(emailValue) {
@@ -62,11 +62,10 @@
         }
 
         return this.each(function() {
-            $(this).bind('blur', function() {
-                var emailInput = $(this);
-                var emailValue = $(this).val();
-                var emailStatus = checkEmailStatus(emailValue);
-                modifyInputOutfit(emailInput, emailStatus, params.invalidCssClassName, params.emptyCssClassName, params.validCssClassName);
+            var emailInput = $(this);
+            emailInput.bind('blur', function() {
+                var emailStatus = checkEmailStatus($(this).val());
+                modifyInputOutfit(emailInput, emailStatus, params.invalidCssClass, params.emptyCssClass, params.validCssClass);
             });
         });
     };
@@ -79,9 +78,9 @@
             capitalLetters : true,
             digits : true,
             specialChars : true,
-            invalidCssClassName : 'invalid',
-            emptyCssClassName : 'empty',
-            validCssClassName : 'valid'
+            invalidCssClass : 'invalid',
+            emptyCssClass : 'empty',
+            validCssClass : 'valid'
         }, options);
 
         function checkPasswordStatus(passwordValue) {
@@ -113,11 +112,10 @@
         }
 
         return this.each(function() {
-            $(this).bind('blur', function() {
-                var passwordInput = $(this);
-                var passwordValue = $(this).val();
-                var passwordStatus = checkPasswordStatus(passwordValue);
-                modifyInputOutfit(passwordInput, passwordStatus, params.invalidCssClassName, params.emptyCssClassName, params.validCssClassName);
+            var passwordInput = $(this);
+            passwordInput.bind('blur', function() {
+                var passwordStatus = checkPasswordStatus(passwordInput.val());
+                modifyInputOutfit(passwordInput, passwordStatus, params.invalidCssClass, params.emptyCssClass, params.validCssClass);
             });
         });
     };
@@ -125,9 +123,9 @@
     $.fn.addPasswordEntropyValidator = function(options) {
         var params = $.extend({
             entropyOfStrongPassword : '47.5',   //odpowiednik entropi dla małych, dużych liter oraz cyfr 8 znaków
-            invalidCssClassName : 'invalid',
-            emptyCssClassName : 'empty',
-            validCssClassName : 'valid'
+            invalidCssClass : 'invalid',
+            emptyCssClass : 'empty',
+            validCssClass : 'valid'
         }, options);
 
         function checkPasswordStatus(passwordValue) {
@@ -164,11 +162,116 @@
         }
 
         return this.each(function() {
-            $(this).bind('blur', function() {
-                var passwordInput = $(this);
-                var passwordValue = $(this).val();
-                var passwordStatus = checkPasswordStatus(passwordValue);
-                modifyInputOutfit(passwordInput, passwordStatus, params.invalidCssClassName, params.emptyCssClassName, params.validCssClassName);
+            var passwordInput = $(this);
+            passwordInput.bind('blur', function() {
+                var passwordStatus = checkPasswordStatus(passwordInput.val());
+                modifyInputOutfit(passwordInput, passwordStatus, params.invalidCssClass, params.emptyCssClass, params.validCssClass);
+            });
+        });
+    };
+
+    $.fn.addPostalCodeValidatorWithCityAndStreetFiller = function(options) {
+        var params = $.extend({
+            postalCodesCsvFileName : 'postalCodes.csv',
+            cityInputId : 'city',
+            streetInputId : 'street',
+            invalidCssClassName : 'invalid',
+            emptyCssClassName : 'empty',
+            validCssClassName : 'valid'
+        }, options);
+
+        function readFromCsvFile() {
+            var lines;
+            $.ajax({
+                type: "GET",
+                url: params.postalCodesCsvFileName,
+                dataType: "text",
+                success: function(data, lines) {
+                    lines = processData(data);
+                }
+            });
+
+            function processData(csvFile) {
+                var allTextLines = csvFile.split(/\r\n|\n/);
+                var headers = allTextLines[0].split(',');
+                var lines = new Array(allTextLines.length);
+                for (var i = 1; i < allTextLines.length; i++) {
+                    var data = allTextLines[i].split(',');
+                    if (data.length == headers.length) {
+                        lines[i] = new Array(headers.length);
+                        for (var j = 0; j < headers.length; j++) {
+                            lines[i].push(data[j]);
+                        }
+                    }
+                }
+                return lines;
+            }
+
+            console.log('lines'+lines);
+            return lines;
+        }
+
+
+
+        function checkPostalCodeStatus(postalCodeValue, linesCsv) {
+            if (isEmpty(postalCodeValue)) {
+                return 'empty';
+            } else {
+                if (!isPostalCodeFormatCorrect(postalCodeValue)) {
+                    return 'invalid';
+                } else {
+                    if (doesPostalCodeExist(postalCodeValue, linesCsv)) {
+                        return 'valid';
+                    } else {
+                        return 'invalid';
+                    }
+                }
+            }
+        }
+
+        function isPostalCodeFormatCorrect(postalCodeValue) {
+            if (!(postalCodeValue.length === 6)) {
+                return false;
+            } else {
+                for (var i = 0; i < postalCodeValue.length; i++) {
+                    var char = postalCodeValue.charAt(i);
+                    if (i === 2) {
+                        if (char !== '-') {
+                            return false;
+                        }
+                        continue;
+                    }
+                    if (!isDigit(char)) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function isDigit(char) {
+            if (char >= '0' && char <= '9') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function doesPostalCodeExist(postalCodeValue, csvLines) {
+            console.log('csvLines' + csvLines);
+            for (var i = 0; i < csvLines.length; i++) {
+                if (postalCodeValue === csvLines[i][0]) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        return this.each(function() {
+            var postalCodeInput = $(this);
+            var csvLines = readFromCsvFile();
+            postalCodeInput.bind('keyup keydown', function() {
+                var postalCodeStatus = checkPostalCodeStatus(postalCodeInput.val(), csvLines);
             });
         });
     };
