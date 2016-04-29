@@ -8,9 +8,8 @@ $(document).ready(function() {
     $('#postal-code').addPostalCodeValidatorWithCityAndStreetFiller();
     document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('#submit').addEventListener('click', function() {
-            if($('#password').hasClass('#valid')) {
-                console.log('sending data to server');
-            }
+            //here should be a check if all elements with validators have class valid
+            //if yes, form data can be send to server :)
         });
     });
 });

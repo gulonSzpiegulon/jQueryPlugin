@@ -59,11 +59,11 @@ input[type=submit]:hover {
 }
 
 .invalid {
-    border-color: red;
+    border-color: rgb(255, 45, 45);
 }
 
 .valid {
-    border-color: green;
+    border-color: rgb(0, 105, 168);
 }
 
 .empty {
